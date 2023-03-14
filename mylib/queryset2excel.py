@@ -1,6 +1,7 @@
 import copy
 import csv
 from os import path
+import os
 import re
 
 import openpyxl
@@ -66,7 +67,6 @@ def get_row_value(row, index):
         try:
             return value.strip()
         except Exception as e:
-
             try:
                 return str(int(value))
             except Exception as e:
@@ -119,6 +119,11 @@ def importExcelCsv(filename, headers_only=False, include_rows_count=False, impor
         yield sheets_headers
 
 
+def ensure_dir_or_create(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+
 def exportExcelSheetOptimized(export_id, iterator, headers=[], filename=None, name=None):
     if len(headers) == 0 or filename is None:
         print("No filename or headers provided")
@@ -145,6 +150,8 @@ def exportExcelSheetOptimized(export_id, iterator, headers=[], filename=None, na
 
     Export.objects.filter(id=export_id).update(exported_rows_count=F("exported_rows_count") + counter, status="P")
     # print(Export.objects.get(id=export_id).exported_rows_count)
+
+    ensure_dir_or_create(path.join(MEDIA_ROOT, "Exports"))
 
     file_path = path.join(MEDIA_ROOT, "Exports", "{}-{}.xlsx".format(filename, export_id))
     wb.save(file_path)
