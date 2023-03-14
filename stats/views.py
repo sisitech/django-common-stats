@@ -1,3 +1,4 @@
+import sys
 from django.db.models import Count, F
 from mylib.my_common import str2bool
 
@@ -51,11 +52,17 @@ class MyCustomDyamicStats(FilterBasedOnRole):
 
         ## Filter based on definitions
         enabled_filters = stat_utils.get_enabled_filters(self.stats_definitions, self.stat_type)
+
         # print(enabled_filters)
         if enabled_filters:
+            ## Override with filters from enabled filters
+
             queryset = queryset.filter(**enabled_filters)
 
         queryset = self.get_my_queryset(queryset)
+
+        ## Custom filtering
+
         queryset = self.get_grouped_by_data(queryset)
 
         paginator = self.request.query_params.get("paginator", "standard")
@@ -95,19 +102,35 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             headers = self.get_headers(queryset.first())
             filters = self.get_possible_filters()
             query_params = self.request.query_params
-            export_students_reports(
-                xp.id,
-                user_id=self.request.user.id,
-                verbose_name=xp.name,
-                model_name=self.get_model_name(),
-                app_name=self.get_model_app_name(),
-                count_name=self.count_name,
-                query_params=query_params,
-                stat_type=self.stat_type,
-                headers=headers,
-                filters=filters,
-                creator=xp,
-            )
+            if "test" in sys.argv:
+                export_students_reports(
+                    xp.id,
+                    user_id=self.request.user.id,
+                    verbose_name=xp.name,
+                    model_name=self.get_model_name(),
+                    app_name=self.get_model_app_name(),
+                    count_name=self.count_name,
+                    query_params=query_params,
+                    stat_type=self.stat_type,
+                    headers=headers,
+                    filters=filters,
+                    creator=xp,
+                )
+            else:
+                export_students_reports.task_function(
+                    xp.id,
+                    user_id=self.request.user.id,
+                    verbose_name=xp.name,
+                    model_name=self.get_model_name(),
+                    app_name=self.get_model_app_name(),
+                    count_name=self.count_name,
+                    query_params=query_params,
+                    stat_type=self.stat_type,
+                    headers=headers,
+                    filters=filters,
+                    creator=xp,
+                )
+
             return Response({"id": xp.id, "name": xp.name, "status": xp.get_status_display()}, status=201)
 
         page = self.paginate_queryset(queryset)

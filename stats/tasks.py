@@ -11,12 +11,11 @@ from stats.models import Export
 from stats.utils import get_grouped_by_data, my_order_by, get_formatted_filter_set
 
 
-
 def get_model_stats_definitions(model_name):
     return models_definitions[model_name]
 
 
-@background(schedule=1)
+@background()
 def export_students_reports(export_id, **kwargs):
     print("JOB\tExport:#{}".format(export_id))
     print(kwargs)
