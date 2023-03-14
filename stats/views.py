@@ -103,7 +103,8 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             filters = self.get_possible_filters()
             query_params = self.request.query_params
             if "test" in sys.argv:
-                export_students_reports(
+                print("Running the test now")
+                export_students_reports.task_function(
                     xp.id,
                     user_id=self.request.user.id,
                     verbose_name=xp.name,
@@ -117,7 +118,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
                     creator=xp,
                 )
             else:
-                export_students_reports.task_function(
+                export_students_reports(
                     xp.id,
                     user_id=self.request.user.id,
                     verbose_name=xp.name,

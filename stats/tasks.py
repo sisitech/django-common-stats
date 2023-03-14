@@ -15,7 +15,7 @@ def get_model_stats_definitions(model_name):
     return models_definitions[model_name]
 
 
-@background()
+@background(schedule=1)
 def export_students_reports(export_id, **kwargs):
     print("JOB\tExport:#{}".format(export_id))
     print(kwargs)
