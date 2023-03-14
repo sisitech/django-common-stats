@@ -3,16 +3,23 @@ from operator import le
 import operator
 from django.db.models import Count, Q
 
-from mylib.my_common import MyCustomException
+from mylib.my_common import MyCustomException, str2bool
+from core.model_definitions import models_definitions
 
 
-def get_formatted_filter_set(stats_definitions, kwargs):
-    # print(kwargs)
+def get_model_stats_definitions(model_name):
+    return models_definitions[model_name]
+
+
+def get_formatted_filter_set(stat_type_stats_definition, kwargs):
+    print("Got formatted filterset")
+    # print(kwargs["query_params"])
+    query_params = kwargs["query_params"]
     filters = kwargs.get("filters")
     stat_type = kwargs.get("stat_type")
     formatted = {"{}__{}".format(ft, filters.get(ft)["lookup_expr"]): "{}".format(filters.get(ft)["value"]) for ft in filters}
 
-    enabled_filters = get_enabled_filters(stats_definitions, stat_type)  # stat_definition.get("enabled_filters", None)
+    enabled_filters = get_enabled_filters(stat_type_stats_definition, stat_type, kwargs, query_params=query_params)  # stat_definition.get("enabled_filters", None)
     if enabled_filters:
         formatted = {**formatted, **enabled_filters}
     # print(stat_type)
@@ -20,9 +27,48 @@ def get_formatted_filter_set(stats_definitions, kwargs):
     return formatted
 
 
-def get_enabled_filters(stats_definitions, stat_type):
+def get_enabled_filters(stats_definitions, stat_type, kwargs, query_params=None):
+    """
+    Get default filters
+
+    "enabled_filters": {
+            "is_training_school": {
+                "field_name": "stream__school__is_training_school",
+                "value": False,
+            },
+        }
+    """
+    # print("Got the folowin query params")
+    # print(query_params)
     stat_definition = stats_definitions[stat_type]
-    return stat_definition.get("enabled_filters", None)
+
+    model_name = kwargs.get("model_name")
+
+    model_definition = get_model_stats_definitions(model_name)
+    default_model_filters = model_definition.get("default_filters", None)
+    # print(default_model_filters)
+    enabled_filters = stat_definition.get("enabled_filters", {})
+    # print(default_model_filters)
+    # print(stats_definitions)
+
+    for key in default_model_filters:
+        # print(key)
+        filter = default_model_filters[key]
+        query_value = query_params.get(key, None)
+        default_value = filter.get("value")
+
+        if type(default_value) == bool and query_value != None:
+            query_value = str2bool(query_value)
+
+        # print(f"Query value {query_value} ")
+        enabled_filters[filter.get("field_name")] = query_value or default_value
+
+    # print(enabled_filters)
+
+    if len(enabled_filters.keys()) == 0:
+        return None
+
+    return enabled_filters
 
 
 def get_order_by_default_field(kwargs):
@@ -128,7 +174,6 @@ def getonly_and_filter_fields(kwargs):
 
 
 def get_grouped_by_data(queryset, stats_definitions, kwargs):
-
     if kwargs.get("stat_type") == "id":
         # Rely on default field for the list in case of any only_and_filter_field fields active
         annotate_fields = kwargs.get("default_fields", {})

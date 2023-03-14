@@ -6,13 +6,9 @@ from django.db.models.functions import Concat, Trunc, TruncDate
 from mylib.my_common import filter_queryset_based_on_role
 from mylib.queryset2excel import exportExcelSheetOptimized
 
-from core.model_definitions import models_definitions
+
 from stats.models import Export
-from stats.utils import get_grouped_by_data, my_order_by, get_formatted_filter_set
-
-
-def get_model_stats_definitions(model_name):
-    return models_definitions[model_name]
+from stats.utils import get_grouped_by_data, my_order_by, get_formatted_filter_set, get_model_stats_definitions
 
 
 @background(schedule=1)
