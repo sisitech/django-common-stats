@@ -1,4 +1,5 @@
 from django.db.models import Count, F
+from mylib.my_common import str2bool
 
 # Create your views here.
 from drf_autodocs.decorators import format_docstring
@@ -11,7 +12,7 @@ from rest_framework.views import APIView
 from mylib.my_common import MyCustomException, MyDjangoFilterBackend, MyStandardPagination, FilterBasedOnRole
 from stats.models import Export
 from stats.serializers import BaseDynamicStatsSerializer
-from stats.tasks import  export_students_reports
+from stats.tasks import export_students_reports
 
 # from stats.utils  as utils
 import stats.utils as stat_utils
@@ -58,6 +59,8 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         queryset = self.get_grouped_by_data(queryset)
 
         paginator = self.request.query_params.get("paginator", "standard")
+
+        ## Global filters
 
         if paginator == "cursor":
             self.pagination_class = CursorSetPagination
@@ -143,8 +146,16 @@ class MyCustomDyamicStats(FilterBasedOnRole):
     def get_possible_filters(self):
         filters = self.get_filter_class().get_filters()
         # print(filters)
-        options = {fp.field_name: {"lookup_expr": fp.lookup_expr, "value": self.request.query_params.get(key)} for key, fp in filters.items() if key in self.request.query_params}
+        options = {fp.field_name: {"lookup_expr": fp.lookup_expr, "value": self.get_filter_value(key, fp)} for key, fp in filters.items() if key in self.request.query_params}
         return options
+
+    def get_filter_value(self, key, filter):
+        # print(filter.__class__.__name__)
+        filter_type_name = filter.__class__.__name__
+        value = self.request.query_params.get(key)
+        if filter_type_name == "BooleanFilter":
+            value = str2bool(value)
+        return value
 
     def get_serializer_class(self):
         return self.serializer_class
@@ -183,5 +194,3 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         kwargs = self.get_utils_kwargs()
         att = stat_utils.get_grouped_by_data(queryset, self.stats_definitions, kwargs)
         return stat_utils.my_order_by(att, kwargs)
-
-
