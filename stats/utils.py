@@ -45,7 +45,7 @@ def get_enabled_filters(stats_definitions, stat_type, kwargs, query_params=None)
     model_name = kwargs.get("model_name")
 
     model_definition = get_model_stats_definitions(model_name)
-    default_model_filters = model_definition.get("default_filters", None)
+    default_model_filters = model_definition.get("default_filters", {})
     # print(default_model_filters)
     enabled_filters = stat_definition.get("enabled_filters", {})
     # print(default_model_filters)
