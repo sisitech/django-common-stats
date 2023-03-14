@@ -151,9 +151,10 @@ def exportExcelSheetOptimized(export_id, iterator, headers=[], filename=None, na
     Export.objects.filter(id=export_id).update(exported_rows_count=F("exported_rows_count") + counter, status="P")
     # print(Export.objects.get(id=export_id).exported_rows_count)
 
-    ensure_dir_or_create(path.join(MEDIA_ROOT, "Exports"))
+    exports_dir_name = "Exports"
+    ensure_dir_or_create(path.join(MEDIA_ROOT, exports_dir_name))
 
-    file_path = path.join(MEDIA_ROOT, "Exports", "{}-{}.xlsx".format(filename, export_id))
+    file_path = path.join(MEDIA_ROOT, exports_dir_name, "{}-{}.xlsx".format(filename, export_id))
     wb.save(file_path)
     xp = Export.objects.get(id=export_id)
     xp.finish(file_path)
