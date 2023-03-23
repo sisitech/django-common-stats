@@ -22,7 +22,8 @@ from openpyxl.utils import get_column_letter
 from mylib.my_common import get_digitalocean_spaces_download_url
 from stats.models import Export
 from stats.serializers import BaseDynamicStatsSerializer
-from tzapi.settings import MEDIA_ROOT
+
+from django.conf import settings
 
 
 def serializerErrorToRow(headers, ser_data):
@@ -152,9 +153,9 @@ def exportExcelSheetOptimized(export_id, iterator, headers=[], filename=None, na
     # print(Export.objects.get(id=export_id).exported_rows_count)
 
     exports_dir_name = "Exports"
-    ensure_dir_or_create(path.join(MEDIA_ROOT, exports_dir_name))
+    ensure_dir_or_create(path.join(settings.MEDIA_ROOT, exports_dir_name))
 
-    file_path = path.join(MEDIA_ROOT, exports_dir_name, "{}-{}.xlsx".format(filename, export_id))
+    file_path = path.join(settings.MEDIA_ROOT, exports_dir_name, "{}-{}.xlsx".format(filename, export_id))
     wb.save(file_path)
     xp = Export.objects.get(id=export_id)
     xp.finish(file_path)
