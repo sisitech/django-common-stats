@@ -134,6 +134,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
                 "logo",
                 "avatar",
                 "location",
+                "translations"
             )  # [f.name for f in model_class.fields if  f.name in ["logo","image","file"]]
             fields = "__all__"
             filter_overrides = {
