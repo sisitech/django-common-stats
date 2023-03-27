@@ -154,11 +154,13 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
         if extra_fields:
             for field in extra_fields:
                 extra_field = self.get_etxra_fields(**field)
+                filter_name = (
+                    f"{field['label']}".replace(" ", "_").lower().strip()
+                )
                 if extra_field:
-                    attrs[field["field_name"]] = extra_field
+                    attrs[filter_name] = extra_field
 
         if filter_mixin:
-
             filter_class = type(
                 model_class.__class__.__name__ + "FilterClass",
                 (filter_mixin, FilterSet),
