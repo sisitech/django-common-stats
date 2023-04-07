@@ -119,7 +119,8 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
 
     def get_dynamic_filter_class(self, model_class, extra_fields=None, filter_mixin=None):
         
-        excluded_fields=settings.get("MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS",[])
+        excluded_fields=settings.MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS or []
+        print("Exclueds are",excluded_fields)
         class Meta:
             model = model_class
             exclude = (
