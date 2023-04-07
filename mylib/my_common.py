@@ -17,7 +17,7 @@ from django.db.models import Case, When, Value
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, CharField
-
+from django.config import settings
 
 class MyUserRoles(enum.Enum):
     A = "Admin"
@@ -119,6 +119,8 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
             raise MyCustomException("Dynamic Filter class error.")
 
     def get_dynamic_filter_class(self, model_class, extra_fields=None, filter_mixin=None):
+        
+        excluded_fields=settings.get("MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS",[])
         class Meta:
             model = model_class
             exclude = (
@@ -135,7 +137,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
                 "avatar",
                 "location",
                 "translations"
-            )  # [f.name for f in model_class.fields if  f.name in ["logo","image","file"]]
+            )+excluded_fields  # [f.name for f in model_class.fields if  f.name in ["logo","image","file"]]
             fields = "__all__"
             filter_overrides = {
                 models.CharField: {
@@ -168,6 +170,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
             )
         else:
             filter_class = type(model_class.__class__.__name__ + "FilterClass", (FilterSet,), attrs)
+        
         return filter_class
 
     def get_etxra_fields(self, field_name, label, field_type, lookup_expr="exact"):
