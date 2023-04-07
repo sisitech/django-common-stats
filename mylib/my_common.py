@@ -119,8 +119,12 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
 
     def get_dynamic_filter_class(self, model_class, extra_fields=None, filter_mixin=None):
         
-        excluded_fields=settings.MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS or []
-        print("Exclueds are",excluded_fields)
+        excluded_fields=("none",) 
+        
+        if hasattr(settings,"MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS"):
+            excluded_fields=settings.MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS
+            
+        # print("Exclueds are",excluded_fields)
         class Meta:
             model = model_class
             exclude = (
@@ -137,6 +141,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
                 "avatar",
                 "location",
                 "translations"
+                
             )+excluded_fields  # [f.name for f in model_class.fields if  f.name in ["logo","image","file"]]
             fields = "__all__"
             filter_overrides = {
