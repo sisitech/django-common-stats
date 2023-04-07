@@ -17,7 +17,6 @@ from django.db.models import Case, When, Value
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, CharField
-from django.config import settings
 
 class MyUserRoles(enum.Enum):
     A = "Admin"
