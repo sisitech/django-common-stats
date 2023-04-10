@@ -183,6 +183,8 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
             return django_filters.NumberFilter(field_name=field_name, label=label, lookup_expr=lookup_expr)
         elif field_type == "char":
             return django_filters.CharFilter(field_name=field_name, label=label, lookup_expr="icontains")
+        elif field_type == "bool":
+            return django_filters.BooleanFilter(field_name=field_name, label=label, lookup_expr=lookup_expr)
         elif field_type == "date":
             return django_filters.DateFilter(field_name=field_name, label=label, lookup_expr=lookup_expr)
         elif field_type == "datetime":
@@ -390,6 +392,7 @@ def get_filters_as_array(filter_args):
 
 def filter_queryset_based_on_role(queryset, user_id=None):
     model = queryset.model
+    
     if user_id == None:
         return queryset
 
