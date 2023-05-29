@@ -156,6 +156,7 @@ def exportExcelSheetOptimized(export_id, iterator, headers=[], filename=None, na
     ensure_dir_or_create(path.join(settings.MEDIA_ROOT, exports_dir_name))
 
     file_path = path.join(settings.MEDIA_ROOT, exports_dir_name, "{}-{}.xlsx".format(filename, export_id))
+
     wb.save(file_path)
     xp = Export.objects.get(id=export_id)
     xp.finish(file_path)

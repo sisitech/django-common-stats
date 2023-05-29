@@ -1,0 +1,58 @@
+
+"""
+
+start_date
+end_date
+phone_image
+
+# Overrall
+total_schools
+total_learners
+total_males
+total_females
+
+# 
+total_new_learners
+total_new_males
+total_new_females
+
+# Totals
+total_schools_with_new_learners
+total_regions_with_new_learners
+total_districts_with_new_learners
+
+# Top
+top_school_with_new_learners
+top_region_with_new_learners
+top_district_with_new_learners
+
+
+# List Enrollment by region,school
+regions_list_with_new_learners
+schools_list_with_new_learners
+ages_list_with_new_learners
+special_needs_list_with_new_learners
+
+## Attendance
+
+
+# Totals
+total_schools_with_attendance
+total_regions_with_attendance
+total_districts_with_attendance
+
+# Tops
+top_school_with_attendance
+top_region_with_attendance
+top_district_with_attendance
+boys_attendance_percentage
+girls_attendance_percentage
+
+# List Enrollment by region,school
+regions_list_with_attendance
+schools_list_with_attendance
+ages_list_with_attendance
+special_needs_list_with_attendance
+
+
+"""

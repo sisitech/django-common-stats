@@ -1,4 +1,5 @@
 import enum
+import os
 import django_filters
 from background_task import background
 from django.core.mail import send_mail
@@ -18,6 +19,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q, CharField
 
+
 class MyUserRoles(enum.Enum):
     A = "Admin"
     SCHA = "School Admin"
@@ -36,6 +38,11 @@ get_redirect_url()
 MyUser = getattr(settings, "AUTH_USER_MODEL", "auth.User")
 
 from django.contrib.auth import get_user_model
+
+
+def setToJson(SET_OBJ):
+    return {c[0]: c[1] for c in SET_OBJ}
+
 
 FORM_STAGES = (
     ("R", "Reception"),
@@ -83,8 +90,12 @@ def case_generator(options_set: set, field_name: str, default="", override_value
 
 
 def get_digitalocean_spaces_download_url(filepath):
-    
     return ""
+
+
+def ensure_dir_or_create(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 
 class MyDjangoFilterBackend(DjangoFilterBackend):
@@ -118,12 +129,11 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
             raise MyCustomException("Dynamic Filter class error.")
 
     def get_dynamic_filter_class(self, model_class, extra_fields=None, filter_mixin=None):
-        
-        excluded_fields=("none",) 
-        
-        if hasattr(settings,"MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS"):
-            excluded_fields=settings.MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS
-            
+        excluded_fields = ("none",)
+
+        if hasattr(settings, "MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS"):
+            excluded_fields = settings.MYDJANGOFILTERBACKEND_EXCLUDED_FILTER_FIELDS
+
         # print("Exclueds are",excluded_fields)
         class Meta:
             model = model_class
@@ -140,9 +150,8 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
                 "logo",
                 "avatar",
                 "location",
-                "translations"
-                
-            )+excluded_fields  # [f.name for f in model_class.fields if  f.name in ["logo","image","file"]]
+                "translations",
+            ) + excluded_fields  # [f.name for f in model_class.fields if  f.name in ["logo","image","file"]]
             fields = "__all__"
             filter_overrides = {
                 models.CharField: {
@@ -161,9 +170,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
         if extra_fields:
             for field in extra_fields:
                 extra_field = self.get_etxra_fields(**field)
-                filter_name = (
-                    f"{field['label']}".replace(" ", "_").lower().strip()
-                )
+                filter_name = f"{field['label']}".replace(" ", "_").lower().strip()
                 if extra_field:
                     attrs[filter_name] = extra_field
 
@@ -175,7 +182,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
             )
         else:
             filter_class = type(model_class.__class__.__name__ + "FilterClass", (FilterSet,), attrs)
-        
+
         return filter_class
 
     def get_etxra_fields(self, field_name, label, field_type, lookup_expr="exact"):
@@ -392,7 +399,7 @@ def get_filters_as_array(filter_args):
 
 def filter_queryset_based_on_role(queryset, user_id=None):
     model = queryset.model
-    
+
     if user_id == None:
         return queryset
 
@@ -418,7 +425,7 @@ def filter_queryset_based_on_role(queryset, user_id=None):
 
     if type(filter_param) == list:
         qs = []
-        for (index, filter_p) in enumerate(filter_param):
+        for index, filter_p in enumerate(filter_param):
             filter_param_in = f"{filter_p}__in"
             fields = {filter_param_in: filter_values}
             qs.append(Q(**fields))
