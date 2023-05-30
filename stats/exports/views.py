@@ -24,7 +24,11 @@ class ListCreateCustomExportsAPIView(generics.ListCreateAPIView):
     pagination_class = MyStandardPagination
 
     def perform_create(self, serializer):
-        return serializer.save(is_custom=True, type="P")
+        return serializer.save(
+            is_custom=True,
+            type="P",
+            user_id=self.request.user.id,
+        )
 
     def get_queryset(self):
         return self.queryset.filter(user_id=self.request.user.id, is_custom=True)
