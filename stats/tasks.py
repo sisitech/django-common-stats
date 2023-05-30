@@ -97,7 +97,7 @@ def export_custom_reports(export_id, **kwargs):
 
     try:
         start_export()
-        args = report.get_context()
+        args = report.get_context(export)
         prepare_download()
         filaname = f"{name}-{export.title}-{export.id}".replace(" ", "_").lower()
         exports_dir_name = "CustomExports"
