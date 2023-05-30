@@ -101,7 +101,7 @@ def ensure_dir_or_create(dir):
 class MyDjangoFilterBackend(DjangoFilterBackend):
     myfilter_class = None
 
-    def get_filter_class(self, view, queryset=None):
+    def get_filter_class(self, view, querysetPassed=None):
         """
         Return the django-filters `FilterSet` used to filter the queryset.
         """
@@ -113,6 +113,8 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
         filter_mixin = getattr(view, "filter_mixin", None)
 
         try:
+            print("Tryine")
+            print(queryset, view)
             model = queryset.model
             filter_model = model
             ##print"The filter class ...")

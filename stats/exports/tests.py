@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from core.tests import BaseAPITest
 from stats.models import Export
+from django.test import tag
 
 
 class ExportTests(BaseAPITest):

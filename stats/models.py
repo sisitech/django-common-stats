@@ -38,6 +38,7 @@ class Export(MyModel):
         ("D", "Click To Download"),
     )
     name = models.CharField(max_length=45, null=True, blank=True)
+    title = models.CharField(max_length=45, null=True, blank=True)
     description = models.TextField(max_length=1000, null=True, blank=True)
     status = models.CharField(choices=EXPORT_STATUS, default="Q", max_length=3)
     rows_count = models.IntegerField(default=0, editable=False)
@@ -49,6 +50,7 @@ class Export(MyModel):
     end_time = models.DateTimeField(null=True, blank=True, editable=False)
     user = models.ForeignKey(MyUser, null=True, blank=True, on_delete=models.CASCADE)
     errors = models.TextField(max_length=2000, null=True, blank=True)
+    is_custom = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("-id",)
