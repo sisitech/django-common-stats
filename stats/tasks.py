@@ -1,3 +1,4 @@
+import os
 from background_task import background
 from django.apps import apps
 from django.db.models import F, Value, DateField, Count, Q
@@ -5,6 +6,7 @@ from django.db.models.functions import Concat, Trunc, TruncDate
 
 from mylib.my_common import filter_queryset_based_on_role
 from mylib.my_common import ensure_dir_or_create
+from django.core.files.storage import default_storage
 
 from core.custom_reports import CUSTOM_REPORTS
 from mylib.pdf import generate_pdf
@@ -102,14 +104,25 @@ def export_custom_reports(export_id, **kwargs):
         filaname = f"{name}-{export.title}-{export.id}".replace(" ", "_").lower()
         exports_dir_name = "CustomExports"
         export_type = "csv" if export.type == "C" else "pdf"
-        file_path = path.join(settings.MEDIA_ROOT, exports_dir_name, "{}.{}".format(filaname, export_type))
-        ensure_dir_or_create(path.join(settings.MEDIA_ROOT, exports_dir_name))
-        print(template)
+
+        # file_path = path.join(settings.MEDIA_ROOT, exports_dir_name, "{}.{}".format(filaname, export_type))
+        file_path = "{}.{}".format(filaname, export_type)
+
+        # ensure_dir_or_create(path.join(settings.MEDIA_ROOT, exports_dir_name))
+        # print(template)
 
         generate_pdf(template, args, file_path, export_type)
         export = query.first()
-        export.finish(file_path)
-        print(file_path)
+        # print(file_path)
+        final_file_path = path.join(exports_dir_name, "{}.{}".format(filaname, export_type))
+
+        res = default_storage.save(final_file_path, open(file_path, "rb"))
+        export.finish(res)
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(e)
+
     except Exception as e:
         print(e)
         end_error(str(e))
