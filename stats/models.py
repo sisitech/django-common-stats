@@ -73,7 +73,7 @@ class Export(MyModel):
     def duration(self):
         if self.start_time is None or self.end_time is None:
             return 0
-        return self.end_time - self.start_time
+        return 1
 
     def start(self, rows_count):
         self.rows_count = rows_count

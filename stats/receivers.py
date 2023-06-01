@@ -4,7 +4,7 @@ from django.db import models
 from django.dispatch import receiver
 
 from stats.models import Export
-from stats.tasks import export_custom_reports
+from reports.tasks import export_custom_reports
 import sys
 
 
