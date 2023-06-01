@@ -8,10 +8,11 @@ REPORTS = (
 
 REPORT_TYPES = (
     ("pdf", "PDF"),
+    ("png", "PNG"),
     ("html", "HTML"),
 )
 
 
 class PdfReportSerializer(serializers.Serializer):
-    name = serializers.ChoiceField(choices=REPORTS)
+    name = serializers.CharField(required=True)
     type = serializers.ChoiceField(choices=REPORT_TYPES, default="pdf")

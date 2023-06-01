@@ -1,5 +1,6 @@
 import enum
 import os
+from unittest import skip
 import django_filters
 from background_task import background
 from django.core.mail import send_mail
@@ -18,6 +19,15 @@ from django.db.models import Case, When, Value
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, CharField
+
+
+def skip_if(condition, reason):
+    def decorator(test_method):
+        if condition:
+            return skip(reason)(test_method)
+        return test_method
+
+    return decorator
 
 
 class MyUserRoles(enum.Enum):

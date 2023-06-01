@@ -16,7 +16,8 @@ class TestReportPdf(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        template = setToJson(REPORTS)[serializer.validated_data.get("name", "")]
+        template_name = serializer.validated_data.get("name", "")
+        template = f"{template_name}.html"
         report_type = serializer.validated_data.get("type", "pdf")
         data = {}
         filaname = "Rep"
