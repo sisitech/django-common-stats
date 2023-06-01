@@ -27,6 +27,6 @@ class CustomExportSerializer(serializers.ModelSerializer):
             "name",
             "title",
             "description",
-            "start_time",
-            "end_time",
+            "start_date",
+            "end_end",
         )

@@ -51,6 +51,8 @@ class Export(MyModel):
     user = models.ForeignKey(MyUser, null=True, blank=True, on_delete=models.CASCADE)
     errors = models.TextField(max_length=2000, null=True, blank=True)
     is_custom = models.BooleanField(default=False)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering = ("-id",)
@@ -84,7 +86,7 @@ class Export(MyModel):
         self.save()
 
     def finish(self, file_path):
-        self.file.name = path.relpath(file_path, settings.MEDIA_ROOT)
+        self.file.name = file_path
         self.status = "D"
         self.end_time = timezone.now()
         self.save()
