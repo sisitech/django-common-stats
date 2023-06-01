@@ -4,7 +4,7 @@ from mylib.pdf import generate_pdf
 from rest_framework.response import Response
 from mylib.my_common import ensure_dir_or_create
 
-from reports.serializers import REPORTS, PdfReportSerializer
+from reports.serializers import PdfReportSerializer
 from django.conf import settings
 from os import path
 from mylib.my_common import setToJson

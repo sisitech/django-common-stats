@@ -26,8 +26,6 @@ def on_save_export(sender, **kwargs):
     if created:
         if instance.is_custom:
             # Trigget the export
-            export_custom_reports(instance.id)
-
             if "test" in sys.argv:
                 print("Running the test now")
                 export_custom_reports.task_function(instance.id)

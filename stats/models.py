@@ -37,7 +37,18 @@ class Export(MyModel):
         ("F", "Failed"),
         ("D", "Click To Download"),
     )
+    PAGE_SIZES = (
+        (20, "20"),
+        (50, "50"),
+        (100, "100"),
+        (300, "300"),
+        (500, "500"),
+        (800, "800"),
+        (1000, "1000"),
+        (10000, "10000"),
+    )
     name = models.CharField(max_length=45, null=True, blank=True)
+    custom_report_name = models.CharField(max_length=45, null=True, blank=True)
     title = models.CharField(max_length=45, null=True, blank=True)
     description = models.TextField(max_length=1000, null=True, blank=True)
     status = models.CharField(choices=EXPORT_STATUS, default="Q", max_length=3)
@@ -53,6 +64,7 @@ class Export(MyModel):
     is_custom = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
+    page_size = models.IntegerField(choices=PAGE_SIZES, default=20)
 
     class Meta:
         ordering = ("-id",)
@@ -85,8 +97,10 @@ class Export(MyModel):
         self.start_time = timezone.now()
         self.save()
 
-    def finish(self, file_path):
+    def finish(self, file_path, row_count=None):
         self.file.name = file_path
         self.status = "D"
+        if row_count:
+            self.exported_rows_count = row_count
         self.end_time = timezone.now()
         self.save()

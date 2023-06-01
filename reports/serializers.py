@@ -1,11 +1,6 @@
 from rest_framework import serializers
 
 
-REPORTS = (
-    ("main", "main_report.html"),
-    ("main", "main_report.html"),
-)
-
 REPORT_TYPES = (
     ("pdf", "PDF"),
     ("png", "PNG"),

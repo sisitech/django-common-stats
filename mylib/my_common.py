@@ -124,7 +124,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
 
         try:
             print("Tryine")
-            print(queryset, view)
+            # print(queryset, view)
             model = queryset.model
             filter_model = model
             ##print"The filter class ...")

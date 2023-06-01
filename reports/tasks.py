@@ -22,8 +22,8 @@ def export_custom_reports(export_id, **kwargs):
         print("Hello the start")
         query.update(
             **{
-                "rows_count": 0,
-                "exported_rows_count": 0,
+                "rows_count": 3,
+                "exported_rows_count": 1,
                 "status": "E",
                 "errors": "",
             }
@@ -40,6 +40,7 @@ def export_custom_reports(export_id, **kwargs):
     def prepare_download():
         query.update(
             **{
+                "exported_rows_count": 2,
                 "status": "P",
             }
         )
@@ -47,11 +48,14 @@ def export_custom_reports(export_id, **kwargs):
     if not query.exists():
         return
     export = query.first()
-    name = export.name
+    name = export.custom_report_name
+
     if name not in CUSTOM_REPORTS:
         export.errors = f"{name} Not implemented in core.custom_reports.CUSTOM_REPORTS"
         return
     report = CUSTOM_REPORTS[name]
+
+    name = export.name
     template = report.template
     # print(template)
     filaname = "Rep"
@@ -61,6 +65,7 @@ def export_custom_reports(export_id, **kwargs):
         args = report.get_context(export)
         prepare_download()
         filaname = f"{name}-{export.title}-{export.id}".replace(" ", "_").lower()
+
         exports_dir_name = "CustomExports"
         export_type = "csv" if export.type == "C" else "pdf"
 
@@ -83,7 +88,7 @@ def export_custom_reports(export_id, **kwargs):
                 print(new_path)
             except Exception as e:
                 pass
-        export.finish(res)
+        export.finish(res, row_count=3)
         try:
             os.remove(file_path)
         except Exception as e:
