@@ -37,7 +37,7 @@ class Export(MyModel):
         ("F", "Failed"),
         ("D", "Click To Download"),
     )
-    PAGE_SIZES = (
+    LIST_SIZES = (
         (20, "20"),
         (50, "50"),
         (100, "100"),
@@ -64,7 +64,7 @@ class Export(MyModel):
     is_custom = models.BooleanField(default=False)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    page_size = models.IntegerField(choices=PAGE_SIZES, default=20)
+    list_size = models.IntegerField(choices=LIST_SIZES, default=20)
 
     class Meta:
         ordering = ("-id",)
