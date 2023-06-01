@@ -1,6 +1,3 @@
-import inspect
-import traceback
-
 from django.test import TestCase, tag
 
 # Create your tests here.
@@ -52,7 +49,6 @@ class StatsTests(BaseAPITest):
 
     @tag("tg2")
     def test_students_class_stat(self):
-
         resp = self.get_student_stats("class", False)
         # print(resp.json())
         data = resp.json()
