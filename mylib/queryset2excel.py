@@ -3,6 +3,7 @@ import csv
 from os import path
 import os
 import re
+from openpyxl.utils.cell import range_boundaries
 
 import openpyxl
 from lxml.doctestcompare import strip
@@ -58,20 +59,20 @@ def get_header_column_name(column_name):
     return column_name.replace("_", " ").title()
 
 
-def get_row_value(row, index):
+def get_row_value(row, index, sheet=None):
     # print(index,len(row))
+
     if index > len(row) - 1:
         return None
     value = row[index].value
+    # return value
 
-    if value != None:
-        try:
-            return value.strip()
-        except Exception as e:
-            try:
-                return str(int(value))
-            except Exception as e:
-                return value
+    if value != None and "=" in f"{value}":
+        # print(row[index].internal_value)
+        column, row_num, _, _ = range_boundaries(value.replace("=", ""))
+        # print(row_num, column)
+        cell_value = sheet.cell(row=row_num, column=column).value
+        return cell_value
     return value
 
 
