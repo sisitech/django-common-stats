@@ -73,7 +73,25 @@ def get_row_value(row, index, sheet=None):
         # print(row_num, column)
         cell_value = sheet.cell(row=row_num, column=column).value
         return cell_value
+
     return value
+
+
+# def get_row_value(row, index):
+#     # print(index,len(row))
+#     if index > len(row) - 1:
+#         return None
+#     value = row[index].value
+
+#     if value != None:
+#         try:
+#             return value.strip()
+#         except Exception as e:
+#             try:
+#                 return str(int(value))
+#             except Exception as e:
+#                 return value
+#     return value
 
 
 def importExcelCsv(filename, headers_only=False, include_rows_count=False, import_id=None):
@@ -114,7 +132,7 @@ def importExcelCsv(filename, headers_only=False, include_rows_count=False, impor
                         "headers": [get_row_value_name(header) for header in headers],
                     }
                 else:
-                    parsed_row = {get_row_value_name(header): get_row_value(row, index) for index, header in enumerate(headers)}
+                    parsed_row = {get_row_value_name(header): get_row_value(row, index, ws) for index, header in enumerate(headers)}
                     yield {"header_row": False, "sheet": sheet, "row": parsed_row}
     wb.close()
     if headers_only:
