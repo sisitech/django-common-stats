@@ -53,16 +53,16 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         ## Filter based on definitions
         enabled_filters = stat_utils.get_enabled_filters(self.stats_definitions, self.stat_type, self.get_utils_kwargs(), query_params=self.request.query_params)
 
-        # print(enabled_filters)
-        if enabled_filters:
-            ## Override with filters from enabled filters
-            queryset = queryset.filter(**enabled_filters)
-
         queryset = self.get_my_queryset(queryset)
 
         ## Custom filtering
 
         queryset = self.get_grouped_by_data(queryset)
+
+        # print(enabled_filters)
+        if enabled_filters:
+            ## Override with filters from enabled filters
+            queryset = queryset.filter(**enabled_filters)
 
         paginator = self.request.query_params.get("paginator", "standard")
 

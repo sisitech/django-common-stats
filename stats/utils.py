@@ -193,6 +193,7 @@ def get_grouped_by_data(queryset, stats_definitions, kwargs):
                 field_filter = getattr(field, "filter")
                 filters.append(field_filter)
                 valid_only_filter_fields.append(field_name)
+
     if len(filters) == 1:
         att = queryset.filter(*filters)
     elif len(filters) > 1:
@@ -229,4 +230,5 @@ def get_grouped_by_data(queryset, stats_definitions, kwargs):
         .annotate(**annotate_fields)
         .values(*get_annotate_resp_fields(stats_definitions, kwargs))
     )
+
     return att

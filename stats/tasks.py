@@ -40,13 +40,14 @@ def export_students_reports(export_id, **kwargs):
     ## Filter queryset base on role
     queryset = filter_queryset_based_on_role(queryset, kwargs.get("user_id"))
 
+    ## Include deinitions filters
+
+    queryset = get_grouped_by_data(queryset, definitions, kwargs)
+
     ## Filter queryset
     filters = get_formatted_filter_set(definitions, kwargs)
     queryset = queryset.filter(**filters)
 
-    ## Include deinitions filters
-
-    queryset = get_grouped_by_data(queryset, definitions, kwargs)
     # Count before ordering
     rows_count = queryset.count()
     xp = Export.objects.get(id=export_id)
