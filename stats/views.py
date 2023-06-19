@@ -22,9 +22,13 @@ import stats.utils as stat_utils
 class OptimizedExportTriggerAPIView(APIView):
     def get(self, request, *args, **kwargs):
         # Trigger Export
-        xp = Export.objects.create(
+        xp = Export(
             name="Export Students",
+            title="Onekana Report June",
+            custom_report_name="overall",
+            is_custom=True,
         )
+        xp.save()
         # export_students(xp.id, verbose_name=xp.name, creator=xp)
         # notify_user(user.id, verbose_name="Notify user", creator=user)
         return Response({"id": xp.id, "name": xp.name, "status": xp.get_status_display()})

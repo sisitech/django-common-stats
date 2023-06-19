@@ -47,6 +47,8 @@ get_redirect_url()
 """
 MyUser = getattr(settings, "AUTH_USER_MODEL", "auth.User")
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from drf_autodocs.views import TreeView
 from django.contrib.auth import get_user_model
 
 
@@ -106,6 +108,16 @@ def get_digitalocean_spaces_download_url(filepath):
 def ensure_dir_or_create(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
+
+
+class MyStandardPagination(PageNumberPagination):
+    page_size = 100
+    max_page_size = 1000
+    page_size_query_param = "page_size"
+
+
+class ProtectedURlsView(LoginRequiredMixin, TreeView):
+    pass
 
 
 class MyDjangoFilterBackend(DjangoFilterBackend):

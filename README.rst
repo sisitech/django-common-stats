@@ -21,12 +21,8 @@ Quick start
     url("^exports/", include("stats.exports.urls")),
 
 
-3. Run ``python manage.py migrate`` to create the polls models.
+3. Run ``python manage.py migrate`` to create the stats models.
 
-4. Visit http://127.0.0.1:8000/exports/ to participate in the poll.
 
-Contributing
--------------
-1. ``python setup.py sdist``
 
-2. ``python setup.py bdist_wheel``
+
