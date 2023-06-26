@@ -45,11 +45,31 @@ from mylib.my_common import get_redirect_url
 mylib.my_common.MyStandardPagination
 get_redirect_url()
 """
-MyUser = getattr(settings, "AUTH_USER_MODEL", "auth.User")
+from datetime import date
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from drf_autodocs.views import TreeView
 from django.contrib.auth import get_user_model
+
+# from django.contrib.auth.mixins import LoginRequiredMixin
+
+# MyUser = get_user_model()
+
+
+def calculate_age_in_days(birth_date):
+    today = date.today()
+    age = (today - birth_date).days
+    return age
+
+
+def calculate_age(birth_date):
+    today = date.today()
+    age = today.year - birth_date.year
+
+    # Check if the birthday has occurred this year
+    if today.month < birth_date.month or (today.month == birth_date.month and today.day < birth_date.day):
+        age -= 1
+
+    return age
 
 
 def setToJson(SET_OBJ):
@@ -116,7 +136,7 @@ class MyStandardPagination(PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class ProtectedURlsView(LoginRequiredMixin, TreeView):
+class ProtectedURlsView(TreeView):
     pass
 
 
@@ -135,7 +155,7 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
         filter_mixin = getattr(view, "filter_mixin", None)
 
         try:
-            print("Tryine")
+            # print("Tryine")
             # print(queryset, view)
             model = queryset.model
             filter_model = model
