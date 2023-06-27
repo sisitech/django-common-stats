@@ -92,6 +92,20 @@ def get_row_value(row, index, sheet=None):
 #             except Exception as e:
 #                 return value
 #     return value
+def is_value_empty(value):
+    if value == None:
+        return True
+    if f"{value}".strip() == "":
+        return True
+    return False
+
+
+def is_an_empty_row(row):
+    keys = list(row.keys())
+    empty_keys = [key for key in keys if is_value_empty(row[key])]
+    if len(keys) == len(empty_keys):
+        return True
+    return False
 
 
 def importExcelCsv(filename, headers_only=False, include_rows_count=False, import_id=None):
@@ -111,9 +125,13 @@ def importExcelCsv(filename, headers_only=False, include_rows_count=False, impor
         if headers_only:
             headers = [cell.value for cell in next(ws.rows)]
             rows_count = -1
+
             if include_rows_count:
-                for _ in ws.rows:
-                    rows_count += 1
+                for row in ws.rows:
+                    parsed_row = {get_row_value_name(header): get_row_value(row, index, ws) for index, header in enumerate(headers)}
+                    if not is_an_empty_row(parsed_row):
+                        rows_count += 1
+
             sheets_headers.append(
                 {
                     "name": sheet,
@@ -133,7 +151,10 @@ def importExcelCsv(filename, headers_only=False, include_rows_count=False, impor
                     }
                 else:
                     parsed_row = {get_row_value_name(header): get_row_value(row, index, ws) for index, header in enumerate(headers)}
-                    yield {"header_row": False, "sheet": sheet, "row": parsed_row}
+                    # Remove empty rows
+                    if not is_an_empty_row(parsed_row):
+                        yield {"header_row": False, "sheet": sheet, "row": parsed_row}
+
     wb.close()
     if headers_only:
         yield sheets_headers

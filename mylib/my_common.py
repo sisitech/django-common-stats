@@ -1,5 +1,6 @@
 import enum
 import os
+import sys
 from unittest import skip
 import django_filters
 from background_task import background
@@ -53,6 +54,13 @@ from django.contrib.auth import get_user_model
 # from django.contrib.auth.mixins import LoginRequiredMixin
 
 # MyUser = get_user_model()
+
+
+def is_in_test_mode():
+    is_testing = "test" in sys.argv
+    if is_testing:
+        print("Running now in test mode")
+    return is_testing
 
 
 def calculate_age_in_days(birth_date):
