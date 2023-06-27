@@ -46,12 +46,15 @@ def export_custom_reports(export_id, **kwargs):
         )
 
     if not query.exists():
+        print("Export not found")
         return
+
     export = query.first()
     name = export.custom_report_name
 
     if name not in CUSTOM_REPORTS:
         export.errors = f"{name} Not implemented in core.custom_reports.CUSTOM_REPORTS"
+        print(export.errors)
         return
     report = CUSTOM_REPORTS[name]
 
@@ -61,6 +64,7 @@ def export_custom_reports(export_id, **kwargs):
     filaname = "Rep"
 
     try:
+        print("Starting export.")
         start_export()
         args = report.get_context(export)
         prepare_download()
