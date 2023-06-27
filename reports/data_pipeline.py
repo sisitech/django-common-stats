@@ -48,7 +48,7 @@ def get_query_parms(obj):
     return query_params
 
 
-def get_model_info(model):
+def get_model_info(model, filter_info=None):
     model_info = viewsDetails.get(model, None)
 
     if not model_info:
@@ -63,6 +63,11 @@ def get_model_info(model):
 
         overrides = model_info.get("overrides", {})
         model_info = {**source_model_info, **overrides}
+
+    if filter_info:
+        filter_overrides = model_info.get("overrides", {})
+        model_info = {**model_info, **filter_overrides}
+
     return model_info
 
 
@@ -81,7 +86,7 @@ def get_any_stats(model="students", grouping=None, **kwargs):
     for filter_key in filters:
         print("Filter ", filter_key)
         filter_info = filters[filter_key]
-        filter_model_info = get_model_info(filter_info.get("source", ""))
+        filter_model_info = get_model_info(filter_info.get("source", ""), filter_info)
         filter_model_info["response_type"] = ResposeType.dict
         print(kwargs.get("query_params"))
         print(filter_model_info)
