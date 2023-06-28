@@ -45,10 +45,15 @@ def get_response_data(model_info, response, override_response_type=None, **kwarg
                 mapped_response_data = mapped_response_data[value_field]
             else:
                 mapped_response_data = None
+
+        # Returns the first item even if the return type is list
         elif response_data_type == list:
             if field_value:
-                mapped_response_data = filter(list(lambda x: x[value_field]==field_value, mapped_response_data))
-         
+                filtered = list(filter(lambda x: x[value_field] == field_value, mapped_response_data))
+                if len(filtered) > 0:
+                    mapped_response_data = filtered[0]
+                else:
+                    mapped_response_data = None
 
     return mapped_response_data
 
