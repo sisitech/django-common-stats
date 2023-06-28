@@ -10,9 +10,10 @@ except Exception as e:
     viewsDetails = {}
 
 
-def get_response_data(model_info, response):
+def get_response_data(model_info, response, override_response_type=None):
     # print(response)
-    response_type: ResposeType = model_info.get("response_type", ResposeType.any)
+    response_type: ResposeType = override_response_type if override_response_type else model_info.get("response_type", ResposeType.any)
+
     if response_type == ResposeType.any:
         return response
     data_type = type(response)
@@ -21,6 +22,10 @@ def get_response_data(model_info, response):
     if data_type == response_type:
         return response
     is_paginated_response = data_type == collections.OrderedDict and "count" in response
+
+    if is_paginated_response and response_type == ResposeType.count:
+        return response["count"]
+
     if is_paginated_response and response_type == ResposeType.list:
         return response["results"]
     elif response_type == ResposeType.dict or response_type == ResposeType.index:
@@ -71,7 +76,7 @@ def get_model_info(model, filter_info=None):
     return model_info
 
 
-def get_any_stats(model="students", grouping=None, **kwargs):
+def get_any_stats(model="students", grouping=None, response_type=None, **kwargs):
     model_info = get_model_info(model)
     extra_kwargs = model_info.get("extra_kwargs", {})
     kwargs = {**kwargs, **extra_kwargs}
@@ -80,8 +85,15 @@ def get_any_stats(model="students", grouping=None, **kwargs):
     if not grouping:
         grouping = model_info.get("grouping", "")
 
+    if not response_type:
+        response_type = model_info.get("response_type", ResposeType.any)
+
     ## Get filters first
     filters = model_info.get("filters", {})
+    query_params = model_info.get("query_params", {})
+
+    kwargs["query_params"] = {**kwargs["query_params"], **query_params}
+
     parsed_filters = {}
     for filter_key in filters:
         print("Filter ", filter_key)
@@ -92,16 +104,17 @@ def get_any_stats(model="students", grouping=None, **kwargs):
         print(filter_model_info)
         response = get_any_view(view=filter_model_info.get("view"), grouping=filter_model_info.get("grouping"), pass_grouping_kwarg="grouping" in filter_model_info, **kwargs)
         # print(response)
-        mapped_response = get_response_data(filter_model_info, response)
+        mapped_response = get_response_data(filter_model_info, response, override_response_type=response_type)
         print(mapped_response)
-        field_name = filter_info.get("field", None)
-        if field_name != None and field_name in mapped_response:
-            parsed_filters[filter_key] = mapped_response[field_name]
-        else:
-            print("Faield...")
+        if type(mapped_response) == collections.OrderedDict:
+            field_name = filter_info.get("field", None)
+            if field_name != None and field_name in mapped_response:
+                parsed_filters[filter_key] = mapped_response[field_name]
+            else:
+                print("Faield...")
     ## Query Params
     print(parsed_filters)
     kwargs["query_params"] = {**kwargs["query_params"], **parsed_filters}
     print(kwargs["query_params"])
     response = get_any_view(view=model_info.get("view"), grouping=grouping, pass_grouping_kwarg="grouping" in model_info, **kwargs)
-    return get_response_data(model_info, response)
+    return get_response_data(model_info, response, override_response_type=response_type)

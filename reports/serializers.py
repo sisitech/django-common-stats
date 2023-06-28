@@ -22,18 +22,20 @@ from stats.models import Export
 class CustomReportStatisticField(serializers.Field):
     data_key = ""
     grouping = ""
+    response_type = None
 
-    def __init__(self, data_key="", grouping=None, **kwargs):
+    def __init__(self, data_key="", grouping=None, response_type=None, **kwargs):
         kwargs["read_only"] = True
         self.data_key = data_key
         self.grouping = grouping
+        self.response_type = response_type
         kwargs["source"] = "user"
         super(CustomReportStatisticField, self).__init__(**kwargs)
 
     def to_representation(self, value):
         query_params = self.context.get("query_params", {})
         # parent_instance = self.parent.instance
-        return get_any_stats(self.data_key, user=value, grouping=self.grouping, query_params=query_params)
+        return get_any_stats(self.data_key, user=value, grouping=self.grouping, response_type=self.response_type, query_params=query_params)
 
 
 class CustomReportBaseSerializer(serializers.ModelSerializer):

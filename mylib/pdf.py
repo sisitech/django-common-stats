@@ -29,8 +29,9 @@ def generate_pdf(template, data, file_path, export_type="png", orientation="land
     # print(html_string)
     html = HTML(string=html_string)
 
-    css2 = CSS(url="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
-    font = CSS(url="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap")
+    # css2 = CSS(url="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+    # font = CSS(url="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap")
+
     if export_type == "pdf":
         result = html.write_pdf(
             file_path,
