@@ -3,4 +3,5 @@ class ResposeType(object):
     list = list
     count = 2
     dict = dict
+    attPercent = 5
     any = 4

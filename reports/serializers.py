@@ -23,11 +23,14 @@ class CustomReportStatisticField(serializers.Field):
     data_key = ""
     grouping = ""
     response_type = None
+    value = None
 
-    def __init__(self, data_key="", grouping=None, response_type=None, **kwargs):
+    def __init__(self, data_key="", grouping=None, response_type=None, value=None, value_field=None, **kwargs):
         kwargs["read_only"] = True
         self.data_key = data_key
         self.grouping = grouping
+        self.value = value
+        self.value_field = value_field
         self.response_type = response_type
         kwargs["source"] = "user"
         super(CustomReportStatisticField, self).__init__(**kwargs)
@@ -35,7 +38,9 @@ class CustomReportStatisticField(serializers.Field):
     def to_representation(self, value):
         query_params = self.context.get("query_params", {})
         # parent_instance = self.parent.instance
-        return get_any_stats(self.data_key, user=value, grouping=self.grouping, response_type=self.response_type, query_params=query_params)
+        kwargs = {"value": self.value, "value_field": self.value_field}
+
+        return get_any_stats(self.data_key, user=value, grouping=self.grouping, response_type=self.response_type, query_params=query_params, **kwargs)
 
 
 class CustomReportBaseSerializer(serializers.ModelSerializer):
