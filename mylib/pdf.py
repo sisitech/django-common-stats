@@ -25,6 +25,9 @@ test_generate_pdf("exports/top-5-template.html",data)
 def generate_pdf(template, data, file_path, export_type="png", orientation="landscape"):
     if os.path.exists(file_path):
         os.remove(file_path)
+
+    # print(template)
+    # print(data)
     html_string = render_to_string(template, data)
     # print(html_string)
     html = HTML(string=html_string)

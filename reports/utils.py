@@ -30,11 +30,13 @@ class BaseCustomReport(object):
         return {"query_params": self.get_query_parms()}
 
     def get_context(self, export):
-        print("Getting context")
+        print("Getting context ")
         self.export = export
         serialize_class = self.get_serializer_class()
         if not serialize_class:
             raise MyCustomException("No serializer_class provided")
+
+        print(f"Getting context serializer{serialize_class}")
         res = serialize_class(export, context=self.get_serializer_context())
         context = res.data
         print(context)

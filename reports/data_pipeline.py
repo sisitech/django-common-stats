@@ -35,6 +35,7 @@ def get_response_data(model_info, response, override_response_type=None, **kwarg
         else:
             mapped_response_data = response
 
+    ### Slice the data
     value_field = kwargs.get("value_field", None)
     field_value = kwargs.get("value", None)
 
@@ -136,4 +137,6 @@ def get_any_stats(model="students", grouping=None, response_type=None, **kwargs)
     kwargs["query_params"] = {**kwargs["query_params"], **parsed_filters}
     # print(kwargs["query_params"])
     response = get_any_view(view=model_info.get("view"), grouping=grouping, pass_grouping_kwarg="grouping" in model_info, **kwargs)
-    return get_response_data(model_info, response, override_response_type=response_type, **kwargs)
+    formatted_data = get_response_data(model_info, response, override_response_type=response_type, **kwargs)
+
+    return formatted_data

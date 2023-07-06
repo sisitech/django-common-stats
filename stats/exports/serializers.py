@@ -36,7 +36,13 @@ class CustomExportSerializer(serializers.ModelSerializer):
             choice = ""
             if len(choices) > 0:
                 choice = choices[0]
-            self.fields.update({"custom_report_name": serializers.ChoiceField(choices=settings.CUSTOM_REPORTS, default=choice)})
+            self.fields.update(
+                {
+                    "custom_report_name": serializers.ChoiceField(
+                        choices=settings.CUSTOM_REPORTS,
+                    )
+                }
+            )
 
     class Meta:
         model = Export

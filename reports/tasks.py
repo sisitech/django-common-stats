@@ -52,6 +52,8 @@ def export_custom_reports(export_id, **kwargs):
     export = query.first()
     name = export.custom_report_name
 
+    print(f"Working on ....{name}")
+
     if name not in CUSTOM_REPORTS:
         export.errors = f"{name} Not implemented in core.custom_reports.CUSTOM_REPORTS"
         print(export.errors)
@@ -64,7 +66,7 @@ def export_custom_reports(export_id, **kwargs):
     filaname = "Rep"
 
     try:
-        print("Starting export.")
+        # print("Starting export.")
         start_export()
         args = report.get_context(export)
         prepare_download()
