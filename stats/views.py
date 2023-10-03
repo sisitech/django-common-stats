@@ -51,6 +51,8 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         self.stat_type = self.get_current_stat_type()
         if self.stat_type not in self.stats_definitions:
             raise MyCustomException("Supported types are: {}".format(",".join(self.stats_definitions)))
+        
+        
 
         queryset = self.filter_queryset(self.get_queryset())
 

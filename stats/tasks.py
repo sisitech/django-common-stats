@@ -46,11 +46,14 @@ def export_students_reports(export_id, **kwargs):
 
     ## Filter queryset
     filters = get_formatted_filter_set(definitions, kwargs)
+    print(filters)
     queryset = queryset.filter(**filters)
-
+    
+    
     # Count before ordering
     rows_count = queryset.count()
     xp = Export.objects.get(id=export_id)
     xp.start(rows_count)
     queryset = my_order_by(queryset, kwargs)
+    
     exportExcelSheetOptimized(export_id, queryset.iterator(chunk_size=3000), headers, filename=xp.name)

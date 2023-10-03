@@ -17,7 +17,7 @@ def get_formatted_filter_set(stat_type_stats_definition, kwargs):
     query_params = kwargs["query_params"]
     filters = kwargs.get("filters")
     stat_type = kwargs.get("stat_type")
-    formatted = {"{}__{}".format(ft, filters.get(ft)["lookup_expr"]): "{}".format(filters.get(ft)["value"]) for ft in filters}
+    formatted = {"{}__{}".format(ft, filters.get(ft)["lookup_expr"]): filters.get(ft)["value"] for ft in filters}
 
     enabled_filters = get_enabled_filters(stat_type_stats_definition, stat_type, kwargs, query_params=query_params)  # stat_definition.get("enabled_filters", None)
     if enabled_filters:
@@ -129,13 +129,17 @@ def get_resp_fields(stats_definitions, kwargs):
 
 def get_comparison_fields(stats_definitions, kwargs):
     stat_type = kwargs.get("stat_type")
-    export = kwargs.get("export", False)
+    query_params = kwargs.get("query_params", False)
+    export = query_params.get("export", False)
+
 
     export_only_fields = stats_definitions[stat_type].get("export_only_fields", {})
 
     if kwargs.get("stat_type") == "id":
         id_fields = {**stats_definitions[stat_type]["extra_fields"]}
+        # print("Export is ada",export)
         if export:
+            # print({**id_fields, **export_only_fields})
             return {**id_fields, **export_only_fields}
         return id_fields
 
@@ -144,17 +148,22 @@ def get_comparison_fields(stats_definitions, kwargs):
         annotate_fields = get_resp_fields(stats_definitions, kwargs)
     else:
         annotate_fields = {**stats_definitions[stat_type]["extra_fields"], **get_resp_fields(stats_definitions, kwargs)}
-
+    
+    
     if export:
         return {**annotate_fields, **export_only_fields}
+   
     return annotate_fields
 
 
 def get_annotate_resp_fields(stats_definitions, kwargs):
     stat_type = kwargs.get("stat_type")
     return_type = kwargs.get("return_type")
+    
+    query_params = kwargs.get("query_params", False)
+    export = query_params.get("export", False)
+    
     if kwargs.get("stat_type") == "id":
-        export = kwargs.get("export", False)
         export_only_fields = stats_definitions[stat_type].get("export_only_fields", {})
 
         resp_fields = stats_definitions[stat_type].get("resp_fields", {})
@@ -230,5 +239,7 @@ def get_grouped_by_data(queryset, stats_definitions, kwargs):
         .annotate(**annotate_fields)
         .values(*get_annotate_resp_fields(stats_definitions, kwargs))
     )
+    
+    
 
     return att
