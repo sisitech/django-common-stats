@@ -19,7 +19,7 @@ from stats.models import Export
 from stats.utils import get_grouped_by_data, my_order_by, get_formatted_filter_set, get_model_stats_definitions
 
 
-@background(schedule=1)
+@background(schedule=1,queue="stats-export")
 def export_students_reports(export_id, **kwargs):
     print("JOB\tExport:#{}".format(export_id))
     print(kwargs)
