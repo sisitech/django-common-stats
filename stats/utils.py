@@ -129,17 +129,16 @@ def get_resp_fields(stats_definitions, kwargs):
 
 def get_comparison_fields(stats_definitions, kwargs):
     stat_type = kwargs.get("stat_type")
-    query_params = kwargs.get("query_params", False)
-    export = query_params.get("export", False)
+    export = kwargs.get("export", False)
 
 
     export_only_fields = stats_definitions[stat_type].get("export_only_fields", {})
 
     if kwargs.get("stat_type") == "id":
         id_fields = {**stats_definitions[stat_type]["extra_fields"]}
-        # print("Export is ada",export)
+        print("Export is ada",export)
         if export:
-            # print({**id_fields, **export_only_fields})
+            print({**id_fields, **export_only_fields})
             return {**id_fields, **export_only_fields}
         return id_fields
 
@@ -159,11 +158,8 @@ def get_comparison_fields(stats_definitions, kwargs):
 def get_annotate_resp_fields(stats_definitions, kwargs):
     stat_type = kwargs.get("stat_type")
     return_type = kwargs.get("return_type")
-    
-    query_params = kwargs.get("query_params", False)
-    export = query_params.get("export", False)
-    
     if kwargs.get("stat_type") == "id":
+        export = kwargs.get("export", False)
         export_only_fields = stats_definitions[stat_type].get("export_only_fields", {})
 
         resp_fields = stats_definitions[stat_type].get("resp_fields", {})

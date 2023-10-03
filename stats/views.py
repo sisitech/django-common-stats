@@ -45,6 +45,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
     pagination_class = MyStandardPagination
     pagination_class = CursorSetPagination
     stats_definitions = None
+    should_export=False
     default_fields = {}
 
     def list(self, request, *args, **kwargs):
@@ -53,7 +54,9 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             raise MyCustomException("Supported types are: {}".format(",".join(self.stats_definitions)))
         
         
-
+        export = True if self.request.query_params.get("export") == "true" else False
+        self.should_export=export
+        
         queryset = self.filter_queryset(self.get_queryset())
 
         ## Filter based on definitions
@@ -85,7 +88,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             else:
                 setattr(self.pagination_class, "ordering", "value")
 
-        export = True if self.request.query_params.get("export") == "true" else False
+        
         descriptions = request.query_params.get("descriptions", "")
         try:
             # parsedDescriptions=list(map(lambda x:{"field":x.split("*")[0],"value":x.split("*")[1]},descriptions.split("-")))
@@ -120,6 +123,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
                     stat_type=self.stat_type,
                     headers=headers,
                     filters=filters,
+                    export=self.should_export,
                     creator=xp,
                 )
             else:
@@ -133,6 +137,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
                     query_params=query_params,
                     stat_type=self.stat_type,
                     headers=headers,
+                    export=self.should_export,
                     filters=filters,
                     creator=xp,
                 )
