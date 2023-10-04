@@ -109,38 +109,10 @@ class MyCustomDyamicStats(FilterBasedOnRole):
 
             headers = self.get_headers(queryset.first())
             filters = self.get_possible_filters()
+            
             query_params = self.request.query_params
-            if "test" in sys.argv:
-                print("Running the test now")
-                export_students_reports.task_function(
-                    xp.id,
-                    user_id=self.request.user.id,
-                    verbose_name=xp.name,
-                    model_name=self.get_model_name(),
-                    app_name=self.get_model_app_name(),
-                    count_name=self.count_name,
-                    query_params=query_params,
-                    stat_type=self.stat_type,
-                    headers=headers,
-                    filters=filters,
-                    export=self.should_export,
-                    creator=xp,
-                )
-            else:
-                export_students_reports(
-                    xp.id,
-                    user_id=self.request.user.id,
-                    verbose_name=xp.name,
-                    model_name=self.get_model_name(),
-                    app_name=self.get_model_app_name(),
-                    count_name=self.count_name,
-                    query_params=query_params,
-                    stat_type=self.stat_type,
-                    headers=headers,
-                    export=self.should_export,
-                    filters=filters,
-                    creator=xp,
-                )
+            self.schedule_export_task(query_params=query_params,headers=headers,filters=filters,export=xp)
+            
 
             return Response({"id": xp.id, "name": xp.name, "status": xp.get_status_display()}, status=201)
 
@@ -151,7 +123,44 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             return self.get_paginated_response(page)
         # serializer = self.get_serializer(queryset, many=True)
         return Response(queryset)
-
+    
+    def get_export_task_user(self):
+        return self.request.user.id
+    
+    def schedule_export_task(self,query_params={},headers=[],filters={},export=None):
+        if "test" in sys.argv:
+            
+            export_students_reports.task_function(
+                export.id,
+                user_id=self.get_export_task_user(),
+                verbose_name=export.name,
+                model_name=self.get_model_name(),
+                app_name=self.get_model_app_name(),
+                count_name=self.count_name,
+                query_params=query_params,
+                stat_type=self.stat_type,
+                headers=headers,
+                filters=filters,
+                export=self.should_export,
+                creator=export,
+            )
+        else:
+            export_students_reports(
+                export.id,
+                user_id=self.get_export_task_user(),
+                verbose_name=export.name,
+                model_name=self.get_model_name(), 
+                app_name=self.get_model_app_name(),
+                count_name=self.count_name,
+                query_params=query_params,
+                stat_type=self.stat_type,
+                headers=headers,
+                export=self.should_export,
+                filters=filters,
+                creator=export,
+            )
+        
+        
     def get_current_stat_type(self):
         stat_type = self.kwargs.get("type", None)
         if stat_type is None:
@@ -179,7 +188,6 @@ class MyCustomDyamicStats(FilterBasedOnRole):
 
     def get_possible_filters(self):
         filters = self.get_filter_class().get_filters()
-        # print(filters)
         options = {fp.field_name: {"lookup_expr": fp.lookup_expr, "value": self.get_filter_value(key, fp)} for key, fp in filters.items() if key in self.request.query_params}
         return options
 

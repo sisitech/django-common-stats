@@ -22,7 +22,7 @@ from stats.utils import get_grouped_by_data, my_order_by, get_formatted_filter_s
 @background(schedule=1,queue="stats-export")
 def export_students_reports(export_id, **kwargs):
     print("JOB\tExport:#{}".format(export_id))
-    print(kwargs)
+    # print(kwargs)
     # User = apps.get_model(app_label='auth', model_name='User')
     headers = kwargs.get("headers")
     model_name = kwargs.get("model_name")
@@ -31,29 +31,37 @@ def export_students_reports(export_id, **kwargs):
     model = apps.get_model(app_name, model_name)
 
     queryset = model.objects.all()
-
-    all_definitions = get_model_stats_definitions(model_name)
-
-    definitions = all_definitions["stats_definition"]
-    kwargs["default_fields"] = all_definitions["default_fields"]
-
-    ## Filter queryset base on role
-    queryset = filter_queryset_based_on_role(queryset, kwargs.get("user_id"))
-
-    ## Include deinitions filters
-
-    queryset = get_grouped_by_data(queryset, definitions, kwargs)
-
-    ## Filter queryset
-    filters = get_formatted_filter_set(definitions, kwargs)
-    print(filters)
-    queryset = queryset.filter(**filters)
     
+    try:
+        all_definitions = get_model_stats_definitions(model_name)
+        definitions = all_definitions["stats_definition"]
+        kwargs["default_fields"] = all_definitions["default_fields"]
     
-    # Count before ordering
-    rows_count = queryset.count()
-    xp = Export.objects.get(id=export_id)
-    xp.start(rows_count)
-    queryset = my_order_by(queryset, kwargs)
+        ## Filter queryset base on role
+        queryset = filter_queryset_based_on_role(queryset, kwargs.get("user_id"))
     
-    exportExcelSheetOptimized(export_id, queryset.iterator(chunk_size=3000), headers, filename=xp.name)
+        ## Include deinitions filters
+    
+        queryset = get_grouped_by_data(queryset, definitions, kwargs)
+    
+        ## Filter queryset
+        filters = get_formatted_filter_set(definitions, kwargs)
+        queryset = queryset.filter(**filters) 
+        
+        
+        # Count before ordering
+        rows_count = queryset.count()
+        xp = Export.objects.get(id=export_id)
+        xp.start(rows_count)
+        queryset = my_order_by(queryset, kwargs)
+        
+        exportExcelSheetOptimized(export_id, queryset.iterator(chunk_size=3000), headers, filename=xp.name)
+    
+    except Exception as e:
+        xp = Export.objects.get(id=export_id)
+        xp.status="F"
+        xp.errors=str(e)
+        xp.save()
+        print(e)
+
+    

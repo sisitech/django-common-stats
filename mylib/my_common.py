@@ -325,7 +325,7 @@ se("Test email","new_user.html",data,["michameiu@gmail.com"])
 """
 
 
-@background(schedule=1)
+@background(schedule=1,queue="send-email")
 def MySendEmail(subject, template, data, recipients, from_email=None):
     print("JOB EMAIL :  {}".format(template))
     if from_email == None:

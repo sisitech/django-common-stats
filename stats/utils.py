@@ -136,9 +136,9 @@ def get_comparison_fields(stats_definitions, kwargs):
 
     if kwargs.get("stat_type") == "id":
         id_fields = {**stats_definitions[stat_type]["extra_fields"]}
-        print("Export is ada",export)
+        # print("Export is ada",export)
         if export:
-            print({**id_fields, **export_only_fields})
+            # print({**id_fields, **export_only_fields})
             return {**id_fields, **export_only_fields}
         return id_fields
 
