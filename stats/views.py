@@ -74,9 +74,9 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         duration = 60
         if hasattr(settings, "CACHE_TIMEOUT"):
             duration = settings.CACHE_TIMEOUT
-        elif duration_secs != None:
-            duration = duration_secs
-        print(f"duration ", duration)
+        if duration_secs != None:
+            duration = int(duration_secs)
+        # print(f"duration ", duration,"dura_sec ",duration_secs)
         cache.set(self.get_key_duration(key), duration, timeout=duration + 3)
         cache.set(key, data, timeout=duration, version=1)
 
@@ -98,6 +98,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             raise MyCustomException("Supported types are: {}".format(",".join(self.stats_definitions)))
         export = True if self.request.query_params.get("export") == "true" else False
         ignore_cache = True if self.request.query_params.get("ignore_cache") == "true" else False
+        cache_timeout = self.request.query_params.get("cache_timeout", None)
 
         # Check if cache enabled
         cache_key = self.get_stats_cache_key()
@@ -188,13 +189,13 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             resp_data_res = self.get_paginated_response(page)
             resp_data = resp_data_res.data
             # resp_data["cache"]=True
-            self.set_cache_data(cache_key, resp_data)
+            self.set_cache_data(cache_key, resp_data, duration_secs=cache_timeout)
             return resp_data_res
 
         # serializer = self.get_serializer(queryset, many=True)
         resp_data = list(queryset)
         # print(resp_data)
-        self.set_cache_data(cache_key, resp_data)
+        self.set_cache_data(cache_key, resp_data, duration_secs=cache_timeout)
         return Response(resp_data)
 
     def get_export_task_user(self):
