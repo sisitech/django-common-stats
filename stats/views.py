@@ -41,9 +41,7 @@ class OptimizedExportTriggerAPIView(APIView):
         xp.save()
         # export_students(xp.id, verbose_name=xp.name, creator=xp)
         # notify_user(user.id, verbose_name="Notify user", creator=user)
-        return Response(
-            {"id": xp.id, "name": xp.name, "status": xp.get_status_display()}
-        )
+        return Response({"id": xp.id, "name": xp.name, "status": xp.get_status_display()})
 
 
 class CursorSetPagination(CursorPagination):
@@ -89,7 +87,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         data = cache.get(key)
         if data == None:
             return data
-        timeout = cache.get(self.get_key_duration())
+        timeout = cache.get(self.get_key_duration(key))
         data["cache"] = True
         data["cache_timeout"] = timeout
         return data
@@ -97,18 +95,18 @@ class MyCustomDyamicStats(FilterBasedOnRole):
     def list(self, request, *args, **kwargs):
         self.stat_type = self.get_current_stat_type()
         if self.stat_type not in self.stats_definitions:
-            raise MyCustomException(
-                "Supported types are: {}".format(",".join(self.stats_definitions))
-            )
+            raise MyCustomException("Supported types are: {}".format(",".join(self.stats_definitions)))
         export = True if self.request.query_params.get("export") == "true" else False
         ignore_cache = True if self.request.query_params.get("ignore_cache") == "true" else False
 
         # Check if cache enabled
         cache_key = self.get_stats_cache_key()
 
-        if not export and ignore_cache:
+        if not export:
             data = self.get_cache_data(cache_key)
-            if data != None:
+            if ignore_cache:
+                pass
+            elif data != None:
                 print("CACHE HIT")
                 return Response(data)
 
@@ -166,9 +164,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
                 raise MyCustomException("No records found.", 400)
 
             xp = Export.objects.create(
-                name="Export {}s by {}".format(
-                    self.get_model_name(), self.get_stat_type_name()
-                ),
+                name="Export {}s by {}".format(self.get_model_name(), self.get_stat_type_name()),
                 args=parsedDescriptions,
                 user_id=self.request.user.id,
             )
@@ -177,9 +173,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             filters = self.get_possible_filters()
 
             query_params = self.request.query_params
-            self.schedule_export_task(
-                query_params=query_params, headers=headers, filters=filters, export=xp
-            )
+            self.schedule_export_task(query_params=query_params, headers=headers, filters=filters, export=xp)
 
             return Response(
                 {"id": xp.id, "name": xp.name, "status": xp.get_status_display()},
@@ -206,10 +200,8 @@ class MyCustomDyamicStats(FilterBasedOnRole):
     def get_export_task_user(self):
         return self.request.user.id
 
-    def schedule_export_task(
-        self, query_params={}, headers=[], filters={}, export=None
-    ):
-        if "test" in sys.argv: 
+    def schedule_export_task(self, query_params={}, headers=[], filters={}, export=None):
+        if "test" in sys.argv:
             export_students_reports.task_function(
                 export.id,
                 user_id=self.get_export_task_user(),
@@ -262,10 +254,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
 
     def get_filters_options(self):
         fclass = self.get_filter_class()
-        filters = {
-            ft.field_name: {"lookup_expr": ft.lookup_expr}
-            for key, ft in fclass.get_filters().items()
-        }
+        filters = {ft.field_name: {"lookup_expr": ft.lookup_expr} for key, ft in fclass.get_filters().items()}
         return filters
 
     def get_possible_filters(self):
@@ -311,9 +300,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
 
     def get_utils_kwargs(self):
         return {
-            "export": True
-            if self.request.query_params.get("export") == "true"
-            else False,
+            "export": True if self.request.query_params.get("export") == "true" else False,
             "count_name": self.count_name,
             "query_params": self.request.query_params,
             "stat_type": self.stat_type,
