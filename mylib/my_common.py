@@ -54,8 +54,6 @@ from django.contrib.auth import get_user_model
 # from django.contrib.auth.mixins import LoginRequiredMixin
 
 # MyUser = get_user_model()
-
-
 def is_in_test_mode():
     is_testing = "test" in sys.argv
     if is_testing:
@@ -234,7 +232,6 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
             )
         else:
             filter_class = type(model_class.__class__.__name__ + "FilterClass", (FilterSet,), attrs)
-
         return filter_class
 
     def get_etxra_fields(self, field_name, label, field_type, lookup_expr="exact"):
