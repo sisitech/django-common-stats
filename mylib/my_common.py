@@ -149,6 +149,9 @@ class ProtectedURlsView(TreeView):
 class MyDjangoFilterBackend(DjangoFilterBackend):
     myfilter_class = None
 
+    def get_filterset_class(self, view, queryset=None):
+        return self.get_filter_class(view=view,querysetPassed=queryset)
+
     def get_filter_class(self, view, querysetPassed=None):
         """
         Return the django-filters `FilterSet` used to filter the queryset.
