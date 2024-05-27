@@ -71,9 +71,13 @@ def get_row_value(row, index, sheet=None):
         # print(row[index].internal_value)
         column, row_num, _, _ = range_boundaries(value.replace("=", ""))
         # print(row_num, column)
-        cell_value = sheet.cell(row=row_num, column=column).value
-        return cell_value
-
+        
+        try:
+            cell_value = sheet.cell(row=row_num, column=column).value 
+            return cell_value
+            
+        except Exception as e:
+            return None
     return value
 
 

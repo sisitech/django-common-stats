@@ -30,6 +30,7 @@ def export_custom_reports(export_id, **kwargs):
         )
 
     def end_error(error):
+        print(error)
         query.update(
             **{
                 "status": "F",
@@ -93,7 +94,10 @@ def export_custom_reports(export_id, **kwargs):
                 new_path = os.path.join(settings.MEDIA_ROOT, res)
                 print(new_path)
             except Exception as e:
+                print(e)
+                print(traceback.format_exc())
                 pass
+            
         export.finish(res, row_count=3)
         try:
             os.remove(file_path)
