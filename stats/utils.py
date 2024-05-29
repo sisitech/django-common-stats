@@ -109,6 +109,11 @@ def get_resp_fields(stats_definitions, kwargs):
     fields[kwargs.get("count_name")] = Count(
         "id",
     )
+    
+    if "extra_resp_fields" in stats_definitions[stat_type]:
+        extra_resp_fields = stats_definitions[stat_type].get("extra_resp_fields", {})
+        fields={**fields,**extra_resp_fields}
+        
 
     # Consider only resp or default fields for the `only_and_filter_field`
     only_and_filter_fields = getonly_and_filter_fields(kwargs)
@@ -120,7 +125,7 @@ def get_resp_fields(stats_definitions, kwargs):
         if return_fields == {}:
             return fields
         return return_fields
-
+    
     return fields
 
 
@@ -147,7 +152,6 @@ def get_comparison_fields(stats_definitions, kwargs):
         annotate_fields = get_resp_fields(stats_definitions, kwargs)
     else:
         annotate_fields = {**stats_definitions[stat_type]["extra_fields"], **get_resp_fields(stats_definitions, kwargs)}
-    
     
     if export:
         return {**annotate_fields, **export_only_fields}
