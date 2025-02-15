@@ -86,7 +86,21 @@ class MyCustomDyamicStats(object):
         return queryset
 
     def get_fields(self):
-        return { 
+        return {
+            self.count_name: Count("id", distinct=True)
+        }
+
+    def get_grouped_by_data(self, queryset):
+        if self.stat_type=="id":
+            return self.my_order_by(queryset)
+
+        att = queryset \
+            .annotate(value=self.get_group_by()) \
+            .values("value") \
+            .annotate(**self.get_comparison_fields()) \
+            .values(*self.get_annotate_resp_fields())
+        return self.my_order_by(att)
+
 
 
 class MyCreateModelMixin(object):
