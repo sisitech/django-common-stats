@@ -50,7 +50,7 @@ class CursorSetPagination(CursorPagination):
     ordering = "-value"
 
 
-class MyCustomDyamicStatsDeprecated(FilterBasedOnRole):
+class MyCustomDyamicStats(FilterBasedOnRole):
     count_name = "count"
     pagination_class = MyStandardPagination
     pagination_class = CursorSetPagination
