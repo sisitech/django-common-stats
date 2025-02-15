@@ -48,6 +48,13 @@ def generateUserToken(activated_user):
     refresh_token.save()
     return {"access_token": access_token.token, "refresh_token": refresh_token.token, "token_type": "Bearer", "expires_in": oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS}
 
+class MyItemsViewMixin(object):
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return self.queryset
+
+        return self.queryset.filter(user_id=self.request.user.id)
+
 
 class MyUserRoles(enum.Enum):
     A = "Admin"
