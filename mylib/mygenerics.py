@@ -9,6 +9,9 @@ from django.conf import settings
 from django.db import models
 from rest_framework import generics,serializers
 
+MyUser = getattr(settings, "AUTH_USER_MODEL", "auth.User")
+
+
 class MyImageCacheSerializer(serializers.Serializer):
     image = Base64ImageField(required=False, max_length=None, use_url=True)
     cache_image = serializers.SerializerMethodField(read_only=True)
@@ -73,6 +76,9 @@ class GroupConcat(Aggregate):
 class MyModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(MyUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="created_%(class)ss", related_query_name="created_%(class)s", editable=False)
+    updated_by = models.ForeignKey(MyUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="updated_%(class)ss", related_query_name="updated_%(class)s", editable=False)
+
 
     class Meta:
         abstract = True
