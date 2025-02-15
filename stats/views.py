@@ -296,7 +296,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
     def get_fields(self):
         return {
             self.count_name: Count(
-                "id",
+                self.count_field,
             )
         }
 

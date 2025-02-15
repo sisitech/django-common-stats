@@ -72,8 +72,9 @@ def get_enabled_filters(stats_definitions, stat_type, kwargs, query_params=None)
 
 
 def get_order_by_default_field(kwargs):
+    count_field = kwargs.get("count_field")
     if kwargs.get("stat_type") == "id":
-        return "id"
+        return count_field
     return "value"
 
 
