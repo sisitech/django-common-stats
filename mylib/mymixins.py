@@ -8,6 +8,9 @@ from mylib.my_common import CursorSetPagination, FilterBasedOnRole, MyCustomExce
 import mylib.utils as stat_utils
 from django.db.models import Count
 
+from stats.models import Export
+from stats.tasks import export_students_reports
+
 
 class MyViewMixin(object):
     filter_backends = (MyDjangoFilterBackend,)
@@ -16,7 +19,7 @@ class MyViewMixin(object):
 class MyCustomDyamicStats(FilterBasedOnRole):
     count_name = "count"
     pagination_class = MyStandardPagination
-    pagination_class = CursorSetPagination
+    # pagination_class = CursorSetPagination
     stats_definitions = None
     default_fields = {}
 
@@ -63,30 +66,30 @@ class MyCustomDyamicStats(FilterBasedOnRole):
         # print("descriptions",parsedDescriptions)
 
         # print(queryset.query)
-        # if export:
-        #     queryset_count = queryset.count()
-        #     if queryset_count < 1:
-        #         raise MyCustomException("No records found.", 400)
+        if export:
+            queryset_count = queryset.count()
+            if queryset_count < 1:
+                raise MyCustomException("No records found.", 400)
 
-        #     xp = Export.objects.create(name="Export {}s by {}".format(self.get_model_name(), self.get_stat_type_name()), args=parsedDescriptions, user_id=self.request.user.id)
+            xp = Export.objects.create(name="Export {}s by {}".format(self.get_model_name(), self.get_stat_type_name()), args=parsedDescriptions, user_id=self.request.user.id)
 
-        #     headers = self.get_headers(queryset.first())
-        #     filters = self.get_possible_filters()
-        #     query_params = self.request.query_params
-        #     export_students_reports(
-        #         xp.id,
-        #         user_id=self.request.user.id,
-        #         verbose_name=xp.name,
-        #         model_name=self.get_model_name(),
-        #         app_name=self.get_model_app_name(),
-        #         count_name=self.count_name,
-        #         query_params=query_params,
-        #         stat_type=self.stat_type,
-        #         headers=headers,
-        #         filters=filters,
-        #         creator=xp,
-        #     )
-        #     return Response({"id": xp.id, "name": xp.name, "status": xp.get_status_display()}, status=201)
+            headers = self.get_headers(queryset.first())
+            filters = self.get_possible_filters()
+            query_params = self.request.query_params
+            export_students_reports(
+                xp.id,
+                user_id=self.request.user.id,
+                verbose_name=xp.name,
+                model_name=self.get_model_name(),
+                app_name=self.get_model_app_name(),
+                count_name=self.count_name,
+                query_params=query_params,
+                stat_type=self.stat_type,
+                headers=headers,
+                filters=filters,
+                creator=xp,
+            )
+            return Response({"id": xp.id, "name": xp.name, "status": xp.get_status_display()}, status=201)
 
         page = self.paginate_queryset(queryset)
         ##Introduce some sort of formatting
