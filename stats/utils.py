@@ -106,10 +106,10 @@ def get_resp_fields(stats_definitions, kwargs):
     else:
         fields = kwargs.get("default_fields", {})
 
-    fields[kwargs.get("count_name")] = Count(
-        "value",
-    )
+    count_field = kwargs.get("count_field")
     
+    fields[kwargs.get("count_name")] = Count(count_field,)
+
     if "extra_resp_fields" in stats_definitions[stat_type]:
         extra_resp_fields = stats_definitions[stat_type].get("extra_resp_fields", {})
         fields={**fields,**extra_resp_fields}

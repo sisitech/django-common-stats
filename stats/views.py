@@ -52,6 +52,7 @@ class CursorSetPagination(CursorPagination):
 
 class MyCustomDyamicStats(FilterBasedOnRole):
     count_name = "count"
+    count_field="id"
     pagination_class = MyStandardPagination
     pagination_class = CursorSetPagination
     stats_definitions = None
@@ -309,6 +310,7 @@ class MyCustomDyamicStats(FilterBasedOnRole):
             "app_name": self.get_model_app_name(),
             "model_name": self.get_model_name(),
             "array_query_params": self.request.GET,
+            "count_field":self.count_field,
         }
 
     def get_grouped_by_data(self, queryset):
