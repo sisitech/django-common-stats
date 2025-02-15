@@ -174,6 +174,37 @@ class ProtectedURlsView(TreeView):
     pass
 
 
+class ManyToManyAndFilter(filters.Filter):
+    """
+    Custom filter to apply AND logic for many-to-many fields with repeated query params.
+    Example: ?tags=1&tags=2
+    """
+    # def filter(self, queryset, value):
+    #     # print("hereer")
+    #     # print(value)
+    #     if not value:
+    #         return queryset
+
+    #     # Ensure the value is a list of multiple query parameters
+    #     if isinstance(value, list):
+    #         for v in value:
+    #             queryset = queryset.filter(**{f"{self.field_name}": v})
+    #     else:
+    #         queryset = queryset.filter(**{f"{self.field_name}": value})
+    #     return queryset
+    
+    def filter(self, queryset, value):
+        if not value:
+            return queryset
+
+        # Split the CSV string into a list of values
+        values = value.split(',')
+        # print(values)
+        self.field_name
+        for v in values:
+            queryset = queryset.filter(**{f"{self.field_name}": v})
+        return queryset
+    
 class MyDjangoFilterBackend(DjangoFilterBackend):
     myfilter_class = None
 
@@ -240,6 +271,9 @@ class MyDjangoFilterBackend(DjangoFilterBackend):
                     "extra": lambda f: {
                         "lookup_expr": "icontains",
                     },
+                },
+                models.ManyToManyField:{
+                    "filter_class":ManyToManyAndFilter,
                 }
             }
 
