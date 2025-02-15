@@ -7,9 +7,6 @@ from mylib.queryset2excel import exportcsv
 from mylib.my_common import CursorSetPagination, FilterBasedOnRole, MyCustomException, MyDjangoFilterBackend, MyIsAuthenticatedOrOptions, MyStandardPagination
 from django.db.models import Count
 
-from stats.models import Export
-from stats.tasks import export_students_reports
-
 
 class MyViewMixin(object):
     filter_backends = (MyDjangoFilterBackend,)
