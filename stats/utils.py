@@ -107,7 +107,7 @@ def get_resp_fields(stats_definitions, kwargs):
         fields = kwargs.get("default_fields", {})
 
     fields[kwargs.get("count_name")] = Count(
-        "id",
+        "value",
     )
     
     if "extra_resp_fields" in stats_definitions[stat_type]:
