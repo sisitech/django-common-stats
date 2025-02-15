@@ -16,11 +16,17 @@ from rest_framework.exceptions import APIException
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import BasePermission
 from django.db.models import Case, When, Value
+from datetime import timedelta
+from django.utils import timezone
+from oauthlib import common
+from oauth2_provider.settings import oauth2_settings
+
 
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, CharField
 
+from oauth2_provider.models import AccessToken, RefreshToken, Application
 
 def skip_if(condition, reason):
     def decorator(test_method):
@@ -29,6 +35,18 @@ def skip_if(condition, reason):
         return test_method
 
     return decorator
+
+def generateUserToken(activated_user):
+    default_client_id = "kadkmalkm218n21b9721u2ji12"
+    default_client_secret = "ueiuuew893iueiwyeiuwyiu"
+    application = Application.objects.get_or_create(client_id=default_client_id, name="autoLogin", authorization_grant_type="password", client_type="public", client_secret=default_client_secret)
+    application = application[0]
+    expires = timezone.now() + timedelta(seconds=60 * 60 * 12 * 365)
+    access_token = AccessToken(user=activated_user, scope="", expires=expires, token=common.generate_token(), application=application)
+    access_token.save()
+    refresh_token = RefreshToken(user=activated_user, token=common.generate_token(), application=application, access_token=access_token)
+    refresh_token.save()
+    return {"access_token": access_token.token, "refresh_token": refresh_token.token, "token_type": "Bearer", "expires_in": oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS}
 
 
 class MyUserRoles(enum.Enum):
@@ -122,7 +140,7 @@ class MyModel(models.Model):
 
 def is_test_mode():
     return "test" in sys.argv
-    
+
 def case_generator(options_set: set, field_name: str, default="", override_values={}, output_field=CharField()):
     original_options_map = dict((x, Value(y)) for x, y in options_set)
     options_map = {**original_options_map, **override_values}
