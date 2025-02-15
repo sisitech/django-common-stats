@@ -120,6 +120,9 @@ class MyModel(models.Model):
         ordering = ("id",)
 
 
+def is_test_mode():
+    return "test" in sys.argv
+    
 def case_generator(options_set: set, field_name: str, default="", override_values={}, output_field=CharField()):
     original_options_map = dict((x, Value(y)) for x, y in options_set)
     options_map = {**original_options_map, **override_values}
