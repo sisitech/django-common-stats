@@ -21,6 +21,7 @@ from django.utils import timezone
 from oauthlib import common
 from oauth2_provider.settings import oauth2_settings
 
+from django_filters import filters
 
 from django.conf import settings
 from django.db import models
