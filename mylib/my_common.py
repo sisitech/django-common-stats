@@ -26,6 +26,7 @@ from django_filters import filters
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, CharField
+from rest_framework.pagination import CursorPagination
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
 
@@ -121,6 +122,11 @@ FORM_STAGES = (
 )
 
 
+class CursorSetPagination(CursorPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    ordering = "-value"
+    
 class MyCustomException(APIException):
     status_code = 503
     detail = "Service temporarily unavailable, try again later."
