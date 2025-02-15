@@ -3,8 +3,36 @@ from rest_framework.generics import GenericAPIView
 from mylib.mymixins import MyCreateModelMixin, MyListModelMixin
 
 from django.db.models.aggregates import Aggregate
+from mylib.image import scramble, Base64ImageField
+from django.conf import settings
 
 from django.db import models
+from rest_framework import generics,serializers
+
+class MyImageCacheSerializer(serializers.Serializer):
+    image = Base64ImageField(required=False, max_length=None, use_url=True)
+    cache_image = serializers.SerializerMethodField(read_only=True)
+    avatar_image = serializers.SerializerMethodField(read_only=True)
+
+    def get_cache_image(self, obj):
+        self.request = self.context.get("request")
+        return get_cache_image_url(self.request, obj.image, obj.cache_image)
+
+    def get_avatar_image(self, obj):
+        self.request = self.context.get("request")
+        return get_cache_image_url(self.request, obj.image, obj.avatar_image)
+
+
+class RequirableBooleanField(serializers.BooleanField):
+    default_empty_html = serializers.empty
+
+
+def get_cache_image_url(request, image, cache_image):
+    if image is None or image == "":
+        return None
+    if request is not None:
+        return request.build_absolute_uri(cache_image.url)
+    return "{}{}".format(settings.MY_SITE_URL, cache_image.url)
 
 
 class GroupConcat(Aggregate):
