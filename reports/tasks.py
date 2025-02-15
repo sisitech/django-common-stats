@@ -67,7 +67,7 @@ def export_custom_reports(export_id, **kwargs):
     filaname = "Rep"
 
     try:
-        # print("Starting export.")
+        print("Starting export....")
         start_export()
         args = report.get_context(export)
         prepare_download()
@@ -102,6 +102,8 @@ def export_custom_reports(export_id, **kwargs):
         try:
             os.remove(file_path)
         except Exception as e:
+            print(e)
+            print(traceback.format_exc())
             print(e)
 
     except Exception as e:
