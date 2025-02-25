@@ -5,7 +5,8 @@ from mylib.mymixins import MyCreateModelMixin, MyListModelMixin
 from django.db.models.aggregates import Aggregate
 from mylib.image import scramble, Base64ImageField
 from django.conf import settings
-
+from imagekit.models import ImageSpecField
+from pilkit.processors import ResizeToFit, ResizeToFill
 from django.db import models
 from rest_framework import generics,serializers
 
@@ -87,6 +88,30 @@ class MyModel(models.Model):
     @staticmethod
     def get_role_filters():
         return {}
+
+
+class MyImageModel(MyModel):
+    image = models.ImageField("uploads", upload_to=scramble, null=True, blank=True)
+    avatar_image = ImageSpecField(source="image", processors=[ResizeToFill(360, 200)], format="JPEG", options={"quality": 80})
+    cache_image = ImageSpecField(source="image", processors=[ResizeToFit(height=600)], format="JPEG", options={"quality": 30})
+
+    class Meta:
+        abstract = True
+        ordering = ("id",)
+
+
+class MyImageCacheSerializer(serializers.Serializer):
+    image = Base64ImageField(required=False, max_length=None, use_url=True)
+    cache_image = serializers.SerializerMethodField(read_only=True)
+    avatar_image = serializers.SerializerMethodField(read_only=True)
+
+    def get_cache_image(self, obj):
+        self.request = self.context.get("request")
+        return get_cache_image_url(self.request, obj.image, obj.cache_image)
+
+    def get_avatar_image(self, obj):
+        self.request = self.context.get("request")
+        return get_cache_image_url(self.request, obj.image, obj.avatar_image)
 
 
 class MyListCreateAPIView(MyCreateModelMixin, MyListModelMixin, GenericAPIView):
