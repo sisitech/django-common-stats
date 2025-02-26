@@ -18,7 +18,7 @@ def upload_images_based_on_date(instance, filename):
     now = timezone.now()
     month_name = now.strftime("%B")
     path = f"Images/{now.year}/{month_name}/{now.day}"
-    return os.path.join(path, filename)
+    return os.path.join(path, scramble(instance,filename) )
 
 
 class MyImageCacheSerializer(serializers.Serializer):
@@ -100,7 +100,7 @@ class MyModel(models.Model):
 
 
 class MyImageModel(MyModel):
-    image = models.ImageField(upload_images_based_on_date, upload_to=scramble, null=True, blank=True)
+    image = models.ImageField( upload_to=upload_images_based_on_date, null=True, blank=True)
     avatar_image = ImageSpecField(source="image", processors=[ResizeToFill(360, 200)], format="JPEG", options={"quality": 80})
     cache_image = ImageSpecField(source="image", processors=[ResizeToFit(height=600)], format="JPEG", options={"quality": 30})
 
