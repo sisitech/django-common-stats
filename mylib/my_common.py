@@ -20,6 +20,7 @@ from datetime import timedelta
 from django.utils import timezone
 from oauthlib import common
 from oauth2_provider.settings import oauth2_settings
+from django.core.mail import EmailMessage
 
 from django_filters import filters
 
@@ -425,6 +426,33 @@ def MySendEmail(subject, template, data, recipients, from_email=None):
         print("Failed to send email")
         return None
 
+@background(schedule=1,queue="send-email")
+def MySendCustomEmail(subject, template, data, recipients, from_email=None):
+    if from_email == None:
+        from_email = settings.DEFAULT_FROM_EMAIL
+    rendered = render_to_string(template, data)
+    print(f"Sending email... {subject}")
+    ema=None
+    try:
+        
+        email = EmailMessage(
+            subject=subject,
+            body=rendered,
+            from_email=from_email,
+            to=recipients,
+            )
+        
+        email.extra_headers = {
+                "Message-ID": data["reference_number"],
+                # Do not include "In-Reply-To" or "References"
+            }
+        email.content_subtype = "html"
+        email.send()
+
+    except Exception as e:
+        print(e)
+    
+    return ema
 
 def tuple_choices_to_map(tupleChoices):
     choices = {}
