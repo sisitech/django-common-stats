@@ -1,7 +1,6 @@
 import sys
 from django.conf import settings
 from django.db.models import Count, F
-from httpx import request
 from mylib.my_common import str2bool
 import time
 
