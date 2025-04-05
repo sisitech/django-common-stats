@@ -49,8 +49,7 @@ def generateUserToken(activated_user):
     if Application.objects.filter(client_id=default_client_id):
         application= Application.objects.filter(client_id=default_client_id).first()
     else:
-        application = Application.objects.get_or_create(client_id=default_client_id, name="autoLogin", authorization_grant_type="password", client_type="public", client_secret=default_client_secret)
-    application = application[0]
+        application = Application.objects.create(client_id=default_client_id, name="autoLogin", authorization_grant_type="password", client_type="public", client_secret=default_client_secret)
     expires = timezone.now() + timedelta(seconds=60 * 60 * 12 * 365)
     access_token = AccessToken(user=activated_user, scope="", expires=expires, token=common.generate_token(), application=application)
     access_token.save()
