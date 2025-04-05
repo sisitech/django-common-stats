@@ -59,7 +59,11 @@ class MyCustomDyamicStats(FilterBasedOnRole):
     default_fields = {}
 
     def get_stats_cache_key(self, suffix_key=""):
-        key = self.request.get_raw_uri()
+        try:
+            key = self.request.get_raw_uri()   
+        except Exception as e:
+            key = self.request.build_absolute_uri()
+                
         user_id = 0
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
