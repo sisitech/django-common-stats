@@ -45,7 +45,11 @@ def skip_if(condition, reason):
 def generateUserToken(activated_user):
     default_client_id = "kadkmalkm218n21b9721u2ji12"
     default_client_secret = "ueiuuew893iueiwyeiuwyiu"
-    application = Application.objects.get_or_create(client_id=default_client_id, name="autoLogin", authorization_grant_type="password", client_type="public", client_secret=default_client_secret)
+    application=None
+    if Application.objects.filter(client_id=default_client_id):
+        application= Application.objects.filter(client_id=default_client_id).first()
+    else:
+        application = Application.objects.get_or_create(client_id=default_client_id, name="autoLogin", authorization_grant_type="password", client_type="public", client_secret=default_client_secret)
     application = application[0]
     expires = timezone.now() + timedelta(seconds=60 * 60 * 12 * 365)
     access_token = AccessToken(user=activated_user, scope="", expires=expires, token=common.generate_token(), application=application)
